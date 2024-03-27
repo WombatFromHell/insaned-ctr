@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+SCRIPT="/root/insaned.script"
+echo "SCAN button pressed"
+env SCANBD_ACTION="scan" $SCRIPT

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+SCRIPT="/root/insaned.script"
+echo "EMAIL button pressed"
+env SCANBD_ACTION="file" $SCRIPT

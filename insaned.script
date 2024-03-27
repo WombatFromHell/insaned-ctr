@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+SCANCMD="scanimage -d genesys --format=tiff --force-calibration"
+OUTDIR="/root/scanned"
+REMOTEDIR="/root/remote"
+
+TMPFILE="$OUTDIR/scan.tiff"
+TMPFILE2="$OUTDIR/scan.jpeg"
+OUTFILE_SCAN="$OUTDIR/scan-$(date '+%Y-%m-%d_%H-%M-%S').jpg"
+OUTFILE_PDF="$OUTDIR/scan-$(date '+%Y-%m-%d_%H-%M-%S').pdf"
+
+CROPOPTS="-bordercolor white -gravity center -border 1 -fuzz 75% -trim +repage -background black -deskew 60% -fuzz 1% -define trim:percent-background=0% -trim +repage"
+
+cleanup() {
+	rm -f "$TMPFILE" "$TMPFILE2"
+}
+
+colorscan() {
+	$SCANCMD --mode Color --resolution 600 -o "$TMPFILE"
+	if [ -r "$TMPFILE" ]; then
+		convert "$TMPFILE" -enhance -contrast -quality 85 "$1"
+		${@:2}
+	fi
+}
+
+grayscan() {
+	$SCANCMD --mode Gray --resolution 300 -o "$TMPFILE"
+	if [ -r "$TMPFILE" ]; then
+		convert "$TMPFILE" -enhance -contrast -density 150 -compress jpeg -quality 80 -alpha off -threshold 60% $CROPOPTS "$TMPFILE2"
+		${@:2}
+	fi
+}
+
+bw2pdf() {
+	INPUT="$1"
+	CONV="img2pdf --pagesize A4 -o $INPUT $TMPFILE2"
+	grayscan "$INPUT" "$CONV" ${@:2}
+}
+
+cleanup
+if [ "$SCANBD_ACTION" == "scan" ]; then
+	CMD="rsync $OUTFILE_SCAN $REMOTEDIR"
+	colorscan "$OUTFILE_SCAN" && $CMD
+else
+	INPUT="$OUTFILE_PDF"
+	CMD="rsync $OUTFILE_PDF $REMOTEDIR"
+	bw2pdf "$INPUT" && $CMD
+	if [ "$SCANBD_ACTION" == "copy" ]; then
+		lp "$INPUT"
+	fi
+fi
+
+cleanup
+exit 0
