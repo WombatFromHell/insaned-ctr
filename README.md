@@ -16,5 +16,5 @@ This is intended to be run as a systemd system unit (as `root:root`) to have acc
   - `sudo systemctl daemon-reload; sudo systemctl enable --now container-insaned_srv.service`
 
 - If you wish to export the running container to a tarball for backup purposes you may use:
-  - "sudo artifacts/export.sh -t" for export to tarball
-  - "sudo artifacts/import.sh" for re-import into docker/podman under the "insaned_srv" label
+  - `sudo artifacts/export.sh -t` for export to tarball
+  - `sudo artifacts/import.sh` for re-import into docker/podman under the "insaned_srv" label
