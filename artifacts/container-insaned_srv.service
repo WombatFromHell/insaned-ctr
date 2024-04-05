@@ -18,7 +18,6 @@ ExecStart=/usr/bin/podman run \
 	--rm \
 	--sdnotify=conmon \
 	--replace \
-	--privileged \
 	-d \
 	--device /dev/bus/usb/003/004 \
 	-v /run/cups/cups.sock:/run/cups/cups.sock \
